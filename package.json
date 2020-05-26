@@ -1,0 +1,8 @@
+{
+  "name": "helm-push",
+  "version": "0.1.0",
+  "description": "Drone plugin for helm chart pushes",
+  "repository": "https://github.com/smoothify/drone-helm-push",
+  "author": "Ben Osman <dev@smoothify.com>",
+  "license": "MIT"
+}
