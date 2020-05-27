@@ -2,11 +2,7 @@ package helm_push
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v3"
-	helmChart "helm.sh/helm/v3/pkg/chart"
-	"helm.sh/helm/v3/pkg/chartutil"
-	"io/ioutil"
-	"log"
+	"github.com/smoothify/drone-helm-push/pkg/helm/chartutil"
 	"os"
 	"os/exec"
 	"path"
@@ -132,21 +128,6 @@ func commandPush(chart Chart, tag string) *exec.Cmd {
 
 func getChartPath(chart Chart) string {
 	return path.Join(chart.Path, chart.File)
-}
-
-func retrieveVersion(chart Chart) (string, error) {
-	yamlFile, err := ioutil.ReadFile(getChartPath(chart))
-	if err != nil {
-		return "", err
-	}
-
-	y := new(helmChart.Metadata)
-	err = yaml.Unmarshal(yamlFile, &y)
-	if err != nil {
-		log.Fatalf("Unmarshal: %v", err)
-	}
-
-	return y.Version, nil
 }
 
 // trace writes each command to stdout with the command wrapped in an xml
