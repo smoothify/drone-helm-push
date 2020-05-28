@@ -34,18 +34,18 @@ func main() {
 		&cli.StringFlag{
 			Name:    "helm.username",
 			Usage:   "helm username",
-			EnvVars: []string{"PLUGIN_HELM_USERNAME"},
+			EnvVars: []string{"PLUGIN_HELM_USERNAME", "PLUGIN_USERNAME"},
 		},
 		&cli.StringFlag{
 			Name:    "helm.password",
 			Usage:   "helm password",
-			EnvVars: []string{"PLUGIN_HELM_PASSWORD"},
+			EnvVars: []string{"PLUGIN_HELM_PASSWORD", "PLUGIN_PASSWORD"},
 		},
 		&cli.StringFlag{
 			Name:     "helm.registry",
 			Usage:    "helm registry",
 			Required: true,
-			EnvVars:  []string{"PLUGIN_HELM_REGISTRY"},
+			EnvVars:  []string{"PLUGIN_HELM_REGISTRY", "PLUGIN_REGISTRY"},
 		},
 		&cli.BoolFlag{
 			Name:    "helm.insecure",
@@ -82,7 +82,7 @@ func main() {
 			Usage:    "chart repo",
 			Value:    ".",
 			Required: true,
-			EnvVars:  []string{"PLUGIN_CHART_REPO"},
+			EnvVars:  []string{"PLUGIN_CHART_REPO", "PLUGIN_REPO"},
 		},
 		&cli.StringFlag{
 			Name:    "chart.version",
