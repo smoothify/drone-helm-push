@@ -2,4 +2,4 @@
 
 package helm_push
 
-const helmExe = "/bin/helm"
+const helmExe = "/usr/bin/helm"
