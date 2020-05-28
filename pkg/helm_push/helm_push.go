@@ -9,8 +9,6 @@ import (
 	"strings"
 )
 
-const helmExe = "/usr/local/bin/helm"
-
 type (
 	// Registry defines helm registry parameters.
 	Registry struct {
