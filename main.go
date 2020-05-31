@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"github.com/smoothify/drone-helm-push/pkg/helm_push"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
@@ -43,15 +44,32 @@ func main() {
 		},
 		&cli.StringFlag{
 			Name:     "helm.registry",
-			Usage:    "helm registry",
-			Required: true,
+			Usage:    "helm oci registry",
 			EnvVars:  []string{"PLUGIN_HELM_REGISTRY", "PLUGIN_REGISTRY"},
+		},
+		&cli.StringFlag{
+			Name:     "helm.repo",
+			Usage:    "helm legacy repo",
+			Value:    ".",
+			EnvVars:  []string{"PLUGIN_HELM_REPO", "PLUGIN_REPO"},
 		},
 		&cli.BoolFlag{
 			Name:    "helm.insecure",
 			Usage:   "helm allows insecure registries",
 			Value:   false,
 			EnvVars: []string{"PLUGIN_INSECURE"},
+		},
+		&cli.BoolFlag{
+			Name:    "helm.oci",
+			Usage:   "helm enable oci",
+			Value:   false,
+			EnvVars: []string{"PLUGIN_HELM_OCI", "PLUGIN_OCI"},
+		},
+		&cli.BoolFlag{
+			Name:    "helm.legacy",
+			Usage:   "helm enable legacy",
+			Value:   true,
+			EnvVars: []string{"PLUGIN_HELM_LEGACY", "PLUGIN_LEGACY"},
 		},
 		&cli.StringFlag{
 			Name:    "context",
@@ -78,11 +96,14 @@ func main() {
 			EnvVars: []string{"PLUGIN_CHART_FILE"},
 		},
 		&cli.StringFlag{
-			Name:     "chart.repo",
-			Usage:    "chart repo",
-			Value:    ".",
-			Required: true,
-			EnvVars:  []string{"PLUGIN_CHART_REPO", "PLUGIN_REPO"},
+			Name:    "chart.url",
+			Usage:   "chart url",
+			EnvVars: []string{"PLUGIN_CHART_URL"},
+		},
+		&cli.StringFlag{
+			Name:    "chart.oci-url",
+			Usage:   "chart oci url",
+			EnvVars: []string{"PLUGIN_CHART_OCI_URL"},
 		},
 		&cli.StringFlag{
 			Name:    "chart.version",
@@ -112,20 +133,30 @@ func getExecDir() string {
 }
 
 func run(c *cli.Context) error {
+	if c.Bool("helm.oci") && c.String("helm.registry") == "" {
+		return errors.New("when helm.oci is enabled, a helm registry must be supplied")
+	}
+	if c.Bool("helm.legacy") && c.String("helm.repo") == "" {
+		return errors.New("when helm.legacy is enabled, a helm repo must be supplied")
+	}
+
 	plugin := helm_push.Plugin{
-		Registry: helm_push.Registry{
+		Helm: helm_push.Helm{
 			RegistryUrl: c.String("helm.registry"),
+			RepoUrl:     c.String("helm.repo"),
 			Username:    c.String("helm.username"),
 			Password:    c.String("helm.password"),
 			Insecure:    c.Bool("helm.insecure"),
+			Oci:         c.Bool("helm.oci"),
+			Legacy:      c.Bool("helm.legacy"),
 		},
 		Chart: helm_push.Chart{
 			Context: c.String("context"),
 			Name:    c.String("chart.name"),
 			Path:    c.String("chart.path"),
 			File:    c.String("chart.file"),
-			Repo:    c.String("chart.repo"),
 			Version: cleanVersionString(c.String("chart.version")),
+			OciUrl:  c.String("chart.oci-url"),
 		},
 		DryRun:         c.Bool("dry-run"),
 		ErrorNoRelease: c.Bool("error-no-release"),
