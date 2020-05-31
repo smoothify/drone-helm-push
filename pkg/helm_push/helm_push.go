@@ -56,7 +56,6 @@ func (p Plugin) Exec() error {
 			cmd.Stdout = os.Stdout
 			cmd.Stderr = os.Stderr
 			cmd.Env = env
-			traceBase64(cmd)
 			err := cmd.Run()
 			if err != nil {
 				return fmt.Errorf("Error authenticating: %s", err)
