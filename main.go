@@ -50,7 +50,6 @@ func main() {
 		&cli.StringFlag{
 			Name:     "helm.repo",
 			Usage:    "helm legacy repo",
-			Value:    ".",
 			EnvVars:  []string{"PLUGIN_HELM_REPO", "PLUGIN_REPO"},
 		},
 		&cli.BoolFlag{
