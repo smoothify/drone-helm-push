@@ -1,6 +1,7 @@
 package helm_push
 
 import (
+	"encoding/base64"
 	"fmt"
 	"github.com/smoothify/drone-helm-push/pkg/helm/chartutil"
 	"os"
@@ -52,8 +53,10 @@ func (p Plugin) Exec() error {
 		if p.Helm.Password != "" {
 			fmt.Sprintln("Logging into helm oci registry %s", p.Helm.RegistryUrl)
 			cmd := commandOciLogin(p.Helm)
+			cmd.Stdout = os.Stdout
 			cmd.Stderr = os.Stderr
 			cmd.Env = env
+			traceBase64(cmd)
 			err := cmd.Run()
 			if err != nil {
 				return fmt.Errorf("Error authenticating: %s", err)
@@ -169,4 +172,9 @@ func getChartOciUrl(plugin Plugin) string {
 // tag so that it can be extracted and displayed in the logs.
 func trace(cmd *exec.Cmd) {
 	fmt.Fprintf(os.Stdout, "+ %s\n", strings.Join(cmd.Args, " "))
+}
+
+func traceBase64(cmd *exec.Cmd) {
+	cmdString := strings.Join(cmd.Args, " ")
+	fmt.Fprintf(os.Stdout, "+ command: %s\n", base64.StdEncoding.EncodeToString([]byte(cmdString)))
 }
