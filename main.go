@@ -43,14 +43,14 @@ func main() {
 			EnvVars: []string{"PLUGIN_HELM_PASSWORD", "PLUGIN_PASSWORD"},
 		},
 		&cli.StringFlag{
-			Name:     "helm.registry",
-			Usage:    "helm oci registry",
-			EnvVars:  []string{"PLUGIN_HELM_REGISTRY", "PLUGIN_REGISTRY"},
+			Name:    "helm.registry",
+			Usage:   "helm oci registry",
+			EnvVars: []string{"PLUGIN_HELM_REGISTRY", "PLUGIN_REGISTRY"},
 		},
 		&cli.StringFlag{
-			Name:     "helm.repo",
-			Usage:    "helm legacy repo",
-			EnvVars:  []string{"PLUGIN_HELM_REPO", "PLUGIN_REPO"},
+			Name:    "helm.repo",
+			Usage:   "helm legacy repo",
+			EnvVars: []string{"PLUGIN_HELM_REPO", "PLUGIN_REPO"},
 		},
 		&cli.BoolFlag{
 			Name:    "helm.insecure",
@@ -63,6 +63,12 @@ func main() {
 			Usage:   "helm enable oci",
 			Value:   false,
 			EnvVars: []string{"PLUGIN_HELM_OCI", "PLUGIN_OCI"},
+		},
+		&cli.BoolFlag{
+			Name:    "helm.dependencies",
+			Usage:   "helm update dependencies",
+			Value:   true,
+			EnvVars: []string{"PLUGIN_HELM_DEPENDENCIES", "PLUGIN_DEPENDENCIES"},
 		},
 		&cli.BoolFlag{
 			Name:    "helm.legacy",
@@ -105,9 +111,9 @@ func main() {
 			EnvVars: []string{"PLUGIN_CHART_OCI_URL"},
 		},
 		&cli.StringFlag{
-			Name:    "chart.version",
-			Usage:   "chart version",
-			EnvVars: []string{"PLUGIN_CHART_VERSION"},
+			Name:     "chart.version",
+			Usage:    "chart version",
+			EnvVars:  []string{"PLUGIN_CHART_VERSION"},
 			FilePath: ".release-version",
 		},
 		&cli.BoolFlag{
@@ -141,13 +147,14 @@ func run(c *cli.Context) error {
 
 	plugin := helm_push.Plugin{
 		Helm: helm_push.Helm{
-			RegistryUrl: c.String("helm.registry"),
-			RepoUrl:     c.String("helm.repo"),
-			Username:    c.String("helm.username"),
-			Password:    c.String("helm.password"),
-			Insecure:    c.Bool("helm.insecure"),
-			Oci:         c.Bool("helm.oci"),
-			Legacy:      c.Bool("helm.legacy"),
+			RegistryUrl:  c.String("helm.registry"),
+			RepoUrl:      c.String("helm.repo"),
+			Username:     c.String("helm.username"),
+			Password:     c.String("helm.password"),
+			Insecure:     c.Bool("helm.insecure"),
+			Dependencies: c.Bool("helm.dependencies"),
+			Oci:          c.Bool("helm.oci"),
+			Legacy:       c.Bool("helm.legacy"),
 		},
 		Chart: helm_push.Chart{
 			Context: c.String("context"),

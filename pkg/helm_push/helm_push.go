@@ -13,13 +13,14 @@ import (
 type (
 	// Helm defines helm repo and registry parameters.
 	Helm struct {
-		RegistryUrl string
-		RepoUrl     string
-		Username    string
-		Password    string
-		Insecure    bool
-		Oci         bool
-		Legacy      bool
+		RegistryUrl  string
+		RepoUrl      string
+		Username     string
+		Password     string
+		Dependencies bool
+		Insecure     bool
+		Oci          bool
+		Legacy       bool
 	}
 
 	// Chart defines helm chart parameters.
@@ -44,6 +45,10 @@ type (
 // Exec executes the plugin step
 func (p Plugin) Exec() error {
 	env := os.Environ()
+	env = append(env,
+		fmt.Sprintf("HELM_REPO_USERNAME=%s", p.Helm.Username),
+		fmt.Sprintf("HELM_REPO_PASSWORD=%s", p.Helm.Password),
+	)
 
 	if p.Helm.Oci {
 		p.Chart.OciUrl = getChartOciUrl(p)
@@ -86,12 +91,11 @@ func (p Plugin) Exec() error {
 
 	var cmds []*exec.Cmd
 
-	if p.Helm.Legacy {
-		env = append(env,
-			fmt.Sprintf("HELM_REPO_USERNAME=%s", p.Helm.Username),
-			fmt.Sprintf("HELM_REPO_PASSWORD=%s", p.Helm.Password),
-		)
+	if p.Helm.Dependencies {
+		cmds = append(cmds, commandDependencyUpdate(p.Chart))
+	}
 
+	if p.Helm.Legacy {
 		cmds = append(cmds, commandPush(p.Chart, p.Helm.RepoUrl))
 	}
 
@@ -126,6 +130,14 @@ func commandOciLogin(helm Helm) *exec.Cmd {
 		"-u", helm.Username,
 		"-p", helm.Password,
 		helm.RegistryUrl,
+	)
+}
+
+func commandDependencyUpdate(chart Chart) *exec.Cmd {
+	return exec.Command(
+		helmExe, "dependency",
+		"update",
+		chart.Path,
 	)
 }
 
